@@ -71,8 +71,8 @@ function drawGame() {
   ctx.fillStyle = "white";
   ctx.font = "50px Arial";
   ctx.fillText(score, box * 2.5, box * 1.7);
-  ctx.fillText(remainingTime, box * 15, box * 1.7);
-
+  ctx.fillText(remainingTime, box * 9, box * 1.7);
+  ctx.fillText(100, box* 15, box * 1.7);
   if (snakeX == food.x && snakeY == food.y) {
     score++;
     food = {
