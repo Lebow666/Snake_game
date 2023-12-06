@@ -11,6 +11,9 @@ let box = 32;
 
 let score = 0;
 
+let startSpeed=200;
+let currentSpeed=startSpeed;
+
 let food = {
   x: Math.floor(Math.random() * 17 + 1) * box,
   y: Math.floor(Math.random() * 15 + 3) * box,
@@ -38,7 +41,7 @@ function direction(event) {
 
 function eatTail(head, arr) {
   for (let i = 1; i < arr.length; i++) {
-    if (head.x == arr[i].x && head.y == arr[i].y) clearInterval(game);
+    if (head.x == arr[i].x && head.y == arr[i].y) gameOver();
   }
 }
 
@@ -52,10 +55,15 @@ function drawGame() {
   ctx.fillStyle = "white";
   ctx.font = "50px Arial";
   ctx.fillText(score, box * 2.5, box * 1.7);
-  ctx.fillText(100, box * 15, box * 1.7);
+  ctx.fillText('Speed ' + (1000/currentSpeed).toFixed(1), box * 13.5, box * 1.7);
 
   if (snakeX == food.x && snakeY == food.y) {
     score++;
+    if (currentSpeed>=startSpeed*0.3) {
+      currentSpeed-=(startSpeed*0.02);
+      clearInterval(game);
+      game=setInterval(drawGame,currentSpeed);
+      }
     food = {
       x: Math.floor(Math.random() * 17 + 1) * box,
       y: Math.floor(Math.random() * 15 + 3) * box,
@@ -102,8 +110,9 @@ function gameOver() {
 
 function restartGame(event) {
   if (event.keyCode == 13) {
+    currentSpeed=startSpeed;
     location.reload();
   }
 }
 
-let game = setInterval(drawGame, 100);
+let game = setInterval(drawGame, currentSpeed);
