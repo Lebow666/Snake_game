@@ -28,9 +28,28 @@ snake[0] = {
 let snakeX = snake[0].x;
 let snakeY = snake[0].y;
 
-document.addEventListener("keydown", direction);
+document.addEventListener("keydown", startGame);
 
 let dir;
+let gameStarted = false;
+let gameTime = 60; // начальное значение времени в секундах
+let gameDuration = 60; // 1 минута
+let remainingTime = gameTime; // оставшееся время
+let timerStarted = false; // флаг для отслеживания запуска таймера
+
+let game;
+
+function startGame(event) {
+  if (!gameStarted) {
+    startTime = Date.now();
+    gameStarted = true;
+    game = setInterval(drawGame, currentSpeed);
+    // Добавляем проверку победы только после начала движения змейки
+    setInterval(checkWin, 1000);
+  }
+  direction(event);
+  timerStarted = true; // Устанавливаем флаг в true после начала движения
+}
 
 function direction(event) {
   if (event.keyCode == 37 && dir != "right") dir = "left";
@@ -55,6 +74,8 @@ function drawGame() {
   ctx.fillStyle = "white";
   ctx.font = "50px Arial";
   ctx.fillText(score, box * 2.5, box * 1.7);
+  ctx.fillText(remainingTime, box * 9, box * 1.7);
+  ctx.font = "30px Arial";
   ctx.fillText('Speed ' + (1000/currentSpeed).toFixed(1), box * 13.5, box * 1.7);
 
   if (snakeX == food.x && snakeY == food.y) {
@@ -96,12 +117,34 @@ function drawGame() {
 
   snake.unshift(newHead);
 }
+
+function checkWin() {
+  if (gameStarted && timerStarted && remainingTime > 0) {
+    remainingTime--;
+  } else if (remainingTime <= 0) {
+    clearInterval(game);
+    gameWin();
+  }
+}
+
 function gameOver() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "red";
   ctx.font = "40px Arial";
   ctx.fillText("Вы проиграли", box * 6, box * 10);
+  ctx.font = "20px Arial";
+  ctx.fillText("Нажмите Enter, чтобы перезапустить игру", box * 4, box * 12);
+  document.removeEventListener("keydown", direction);
+  document.addEventListener("keydown", restartGame);
+}
+
+function gameWin() {
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "green";
+  ctx.font = "40px Arial";
+  ctx.fillText("Вы выиграли!", box * 6, box * 10);
   ctx.font = "20px Arial";
   ctx.fillText("Нажмите Enter, чтобы перезапустить игру", box * 4, box * 12);
   document.removeEventListener("keydown", direction);
@@ -115,4 +158,4 @@ function restartGame(event) {
   }
 }
 
-let game = setInterval(drawGame, currentSpeed);
+startGame();
